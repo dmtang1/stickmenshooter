@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stick Royale</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='32' r='14' fill='black'/><rect x='47' y='46' width='6' height='28' fill='black'/><rect x='32' y='54' width='36' height='5' fill='black'/><rect x='40' y='74' width='5' height='22' fill='black'/><rect x='55' y='74' width='5' height='22' fill='black'/></svg>" />
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+
+    <div id="app">
+      <section id="screen-menu" class="screen">
+        <div class="menu-stage">
+          <canvas id="menu-preview"></canvas>
+        </div>
+        <div class="menu-copy">
+          <p class="kicker">Free to host · Peer to peer</p>
+          <h1>STICK<br />ROYALE</h1>
+          <p class="lede">
+            A hairline battle royale. Stick figures, stick guns, Fortnite-style
+            builds, a shrinking storm. Last line standing wins.
+          </p>
+          <div class="menu-actions">
+            <button id="btn-solo" class="btn primary">Play Solo</button>
+            <button id="btn-host" class="btn">Host Match</button>
+            <button id="btn-join" class="btn">Join Friend</button>
+            <button id="btn-customize" class="btn ghost">Customize</button>
+          </div>
+          <p class="hint">WASD move · Mouse look · Click shoot · Right-click aim · Q/Z/C build · Space glide</p>
+        </div>
+      </section>
+
+      <section id="screen-customize" class="screen hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Locker</h2>
+            <button id="btn-custom-back" class="btn ghost">Back</button>
+          </div>
+          <label class="field">
+            <span>Callsign</span>
+            <input id="name-input" maxlength="14" placeholder="STICK-01" />
+          </label>
+          <div class="option-block">
+            <span>Face</span>
+            <div id="face-options" class="chips"></div>
+          </div>
+          <div class="option-block">
+            <span>Hat</span>
+            <div id="hat-options" class="chips"></div>
+          </div>
+          <div class="option-block">
+            <span>Backpack</span>
+            <div id="pack-options" class="chips"></div>
+          </div>
+          <div class="option-block">
+            <span>Ink color</span>
+            <div id="color-options" class="swatches"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-join" class="screen hidden">
+        <div class="panel slim">
+          <h2>Join a room</h2>
+          <p class="lede">Ask the host for their 6-character code.</p>
+          <input id="join-code" class="code-input" maxlength="6" placeholder="K7MPQX" autocomplete="off" />
+          <p id="join-error" class="error"></p>
+          <div class="row">
+            <button id="btn-join-go" class="btn primary">Connect</button>
+            <button id="btn-join-back" class="btn ghost">Back</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-lobby" class="screen hidden">
+        <div class="panel">
+          <p class="kicker" id="lobby-role">Host</p>
+          <h2 id="lobby-title">Waiting room</h2>
+          <div id="room-code-wrap" class="code-wrap hidden">
+            <span>Room code</span>
+            <strong id="room-code">------</strong>
+            <button id="btn-copy" class="btn ghost small">Copy</button>
+          </div>
+          <p id="lobby-status" class="lede">Share the code. Keep this tab open — your browser is the server.</p>
+          <ul id="lobby-players" class="player-list"></ul>
+          <div class="row">
+            <button id="btn-start" class="btn primary hidden">Start match</button>
+            <button id="btn-lobby-leave" class="btn ghost">Leave</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="hud" class="hidden">
+        <div id="crosshair"></div>
+        <div id="hitmarker"></div>
+        <div class="hud-top">
+          <div class="alive-pill">
+            <b id="alive-count">10</b>
+            <span>alive</span>
+          </div>
+          <div id="storm-chip">Storm <span id="storm-timer">--</span></div>
+          <div id="kill-feed"></div>
+        </div>
+        <canvas id="minimap" width="168" height="168"></canvas>
+        <div class="hud-bottom">
+          <div class="hp-wrap">
+            <div id="hp-bar"></div>
+            <span id="hp-text">100</span>
+          </div>
+          <div class="weapon-wrap">
+            <span id="weapon-name">Stick Pistol</span>
+            <span id="ammo-text">12 / 36</span>
+          </div>
+          <div class="wood-wrap">WOOD <b id="wood-text">80</b></div>
+        </div>
+        <div id="build-bar" class="hidden">
+          <div data-piece="wall" class="build-slot active">Q Wall</div>
+          <div data-piece="floor" class="build-slot">Z Floor</div>
+          <div data-piece="ramp" class="build-slot">C Ramp</div>
+        </div>
+        <div id="banner" class="hidden"></div>
+        <div id="death-choice" class="hidden">
+          <p class="kicker">Eliminated</p>
+          <h2>You got snapped</h2>
+          <p id="death-sub" class="lede">The round is still going.</p>
+          <div class="row">
+            <button id="btn-spectate" class="btn primary">Spectate</button>
+            <button id="btn-leave-match" class="btn">Leave game</button>
+          </div>
+        </div>
+        <div id="spec-bar" class="hidden">
+          <span>Spectating <b id="spec-name">—</b></span>
+          <span class="spec-hint">Click next player</span>
+          <button id="btn-spec-next" class="btn small">Next</button>
+          <button id="btn-spec-leave" class="btn small">Leave</button>
+        </div>
+        <div id="pause" class="hidden">
+          <h2>Paused</h2>
+          <p>Click to resume · Esc also releases the mouse</p>
+          <button id="btn-quit" class="btn">Quit to menu</button>
+        </div>
+      </section>
+
+      <section id="screen-end" class="screen hidden">
+        <div class="panel slim center">
+          <p class="kicker" id="end-kicker">Victory</p>
+          <h2 id="end-title">Last stick standing</h2>
+          <p id="end-sub" class="lede"></p>
+          <button id="btn-end-menu" class="btn primary">Back to menu</button>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
