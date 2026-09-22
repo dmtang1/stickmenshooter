@@ -2,6 +2,8 @@
 
 A minimalist stickman battle royale you can host for free. One friend’s browser is the server. Everyone else connects peer-to-peer. No paid game server.
 
+**Play now:** [https://dmtang1.github.io/stickmenshooter/](https://dmtang1.github.io/stickmenshooter/)
+
 ## Play locally
 
 ```bash
